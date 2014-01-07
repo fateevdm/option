@@ -22,7 +22,7 @@ public final class Some<T> extends Option<T> {
     /**
      * Returns an {@code Option} with the specified present non-null value.
      *
-     * @param <T> the class of the value
+     * @param <T>   the class of the value
      * @param value the value to be present, which must be non-null
      * @return an {@code Option} with the value present
      * @throws NullPointerException if value is null
@@ -84,8 +84,11 @@ public final class Some<T> extends Option<T> {
 
         @Override
         public T next() {
-            hasNext = false;
-            return this.elem;
+            if (hasNext) {
+                hasNext = false;
+                return this.elem;
+            }
+            throw new UnsupportedOperationException();
         }
 
         @Override

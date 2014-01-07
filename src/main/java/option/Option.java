@@ -5,7 +5,6 @@ import utils.Function;
 import utils.Predicate;
 import utils.Supplier;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -218,7 +217,7 @@ public abstract class Option<T> implements Iterable<T> {
      */
     public final List<T> toList() {
         if (isEmpty()) return Collections.emptyList();
-        else return Arrays.asList(this.get());
+        else return Collections.singletonList(this.get());
     }
 
     /**
@@ -272,9 +271,8 @@ public abstract class Option<T> implements Iterable<T> {
      * @throws X                    if there is no value present
      * @throws NullPointerException if no value is present and
      *                              {@code exceptionSupplier} is null
-     * @apiNote A method reference to the exception constructor with an empty
-     * argument list can be used as the supplier. For example,
-     * {@code IllegalStateException::new}
+     *                              A method reference to the exception constructor with an empty
+     *                              argument list can be used as the supplier.
      */
     public final <X extends Throwable> T orElseThrow(Supplier<? extends X> exceptionSupplier) throws X {
         if (isPresent()) return this.get();
