@@ -3,7 +3,7 @@ package option;
 import java.util.Iterator;
 import java.util.Objects;
 
-public class Some<T> extends Option<T>{
+public class Some<T> extends Option<T> {
 
     private final T value;
 
@@ -11,7 +11,7 @@ public class Some<T> extends Option<T>{
         this.value = Objects.requireNonNull(value);
     }
 
-    public static <T> Some<T> Some(T value){
+    public static <T> Some<T> Some(T value) {
         return new Some<T>(Objects.requireNonNull(value));
     }
 
@@ -33,7 +33,7 @@ public class Some<T> extends Option<T>{
     @Override
     public String toString() {
         return "Some{ " +
-                 value +
+                value +
                 " }";
     }
 
@@ -53,13 +53,14 @@ public class Some<T> extends Option<T>{
         return Objects.hashCode(value);
     }
 
-    private class OptionIter<T> implements Iterator<T>{
+    private class OptionIter<T> implements Iterator<T> {
         private boolean hasNext = true;
         private final T elem;
 
-        private OptionIter(T elem){
-           this.elem = elem;
+        private OptionIter(T elem) {
+            this.elem = elem;
         }
+
         @Override
         public boolean hasNext() {
             return hasNext;

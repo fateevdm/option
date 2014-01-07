@@ -21,10 +21,11 @@ public class None extends Option {
      */
     private static final None EMPTY = new None();
 
-    private None(){}
+    private None() {
+    }
 
     @Override
-    public  Object get() {
+    public Object get() {
         throw new NoSuchElementException("Called get on None");
     }
 
@@ -33,12 +34,12 @@ public class None extends Option {
         return false;
     }
 
-    public static None None(){
+    public static None None() {
         return EMPTY;
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "None";
     }
 
@@ -49,12 +50,12 @@ public class None extends Option {
 
     @Override
     public boolean equals(Object obj) {
-        if(this == obj) return true;
+        if (this == obj) return true;
         if (obj == null) return false;
-        if(!(obj instanceof None)) return false;
+        if (!(obj instanceof None)) return false;
 
-        None other = (None)obj;
-        return Objects.equals(EMPTY,other);
+        None other = (None) obj;
+        return Objects.equals(EMPTY, other);
 
     }
 }

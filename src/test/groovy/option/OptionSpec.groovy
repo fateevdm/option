@@ -1,9 +1,9 @@
-import option.Option
-import spock.lang.Specification
+package option
 
-import java.util.function.Function
-import java.util.function.Predicate
-import java.util.function.Supplier
+import spock.lang.Specification
+import utils.Function
+import utils.Predicate
+import utils.Supplier
 
 import static option.None.None
 import static option.Some.Some
@@ -78,7 +78,7 @@ class OptionSpec extends Specification{
         setup:
              Option<Integer> integerOption = Some(1)
         when:
-           Option<String> stringOption = integerOption.map(new Function<Integer,String>() {
+           Option<String> stringOption = integerOption.map(new Function<Integer, String>() {
                 @Override
                 String apply(Integer o) {
                     return o.toString()

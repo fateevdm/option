@@ -1,10 +1,11 @@
 package option;
 
+import utils.Consumer;
+import utils.Function;
+import utils.Predicate;
+import utils.Supplier;
+
 import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 import static option.None.None;
 import static option.Some.Some;
@@ -52,22 +53,22 @@ public abstract class Option<T> implements Iterable<T> {
         else return ofNullable(mapper.apply(get()));
     }
 
-    public <U> Option<U> flatMap(Function<? super T, ? extends Option<U>> mapper){
+    public <U> Option<U> flatMap(Function<? super T, ? extends Option<U>> mapper) {
         Objects.requireNonNull(mapper);
-        if(this.isEmpty())return empty();
+        if (this.isEmpty()) return empty();
         else return Objects.requireNonNull(mapper.apply(this.get()));
     }
 
-    public T orElse(T other){
+    public T orElse(T other) {
         return isEmpty() ? other : this.get();
     }
 
     public T orElseGet(Supplier<? extends T> other) {
-        return isPresent() ? this.get(): other.get();
+        return isPresent() ? this.get() : other.get();
     }
 
-    public <X extends Throwable> T orElseThrow (Supplier<? extends X> exceptionSupplier) throws X {
-        if(isPresent()) return this.get();
+    public <X extends Throwable> T orElseThrow(Supplier<? extends X> exceptionSupplier) throws X {
+        if (isPresent()) return this.get();
         else throw exceptionSupplier.get();
     }
 
