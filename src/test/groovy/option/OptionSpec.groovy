@@ -51,7 +51,7 @@ class OptionSpec extends Specification{
         expect: None().filter(new Predicate<Integer>() {
             @Override
             boolean test(Integer o) {
-                return true
+                true
             }
         }) == None()
     }
@@ -60,7 +60,7 @@ class OptionSpec extends Specification{
         expect: Some('a').filter(new Predicate<String>() {
             @Override
             boolean test(String s) {
-                return !s.equalsIgnoreCase("a")
+                !s.equalsIgnoreCase("a")
             }
         }) == None()
     }
@@ -69,9 +69,36 @@ class OptionSpec extends Specification{
         expect: Some('a').filter(new Predicate<String>() {
             @Override
             boolean test(String s) {
-                return s.equalsIgnoreCase("a")
+                s.equalsIgnoreCase("a")
             }
         }) == Some("a")
+    }
+
+    def "filterNot Some('b') by 'string == a' should return Some('b')"(){
+        expect: Some("b").filterNot(new Predicate<String>() {
+            @Override
+            boolean test(String s) {
+                s.equalsIgnoreCase("a")
+            }
+        }) == Some("b")
+    }
+
+    def "filterNot Some('b') by 'string == b' should return None()"(){
+        expect: Some("b").filterNot(new Predicate<String>() {
+            @Override
+            boolean test(String s) {
+                s.equalsIgnoreCase("b")
+            }
+        }) == None()
+    }
+
+    def "filterNot on None should produce None"(){
+        expect: None().filterNot(new Predicate<Integer>() {
+            @Override
+            boolean test(Integer o) {
+                true
+            }
+        }) == None()
     }
 
     def "map function from int to string on Option(1) should produce Option('1')"(){
@@ -81,7 +108,7 @@ class OptionSpec extends Specification{
            Option<String> stringOption = integerOption.map(new Function<Integer, String>() {
                 @Override
                 String apply(Integer o) {
-                    return o.toString()
+                    o.toString()
                 }
             })
         then:
@@ -94,7 +121,7 @@ class OptionSpec extends Specification{
             Option<Integer> opStr = opInt.map(new Function<Integer,Integer>() {
                 @Override
                 Integer apply(Integer o) {
-                    return (o.intValue() + 1)
+                    (o.intValue() + 1)
                 }
             })
         then:
@@ -107,7 +134,7 @@ class OptionSpec extends Specification{
         Option<String> opStr = opInt.flatMap(new Function<Integer,Option<String>>() {
             @Override
             Option<String> apply(Integer o) {
-                return o == null? None(): Some(o.toString())
+                o == null? None(): Some(o.toString())
             }
         })
         then:
@@ -120,11 +147,97 @@ class OptionSpec extends Specification{
         Option<String> opStr = opInt.flatMap(new Function<Integer,Option<String>>() {
             @Override
             Option<String> apply(Integer o) {
-                return Some(o.toString())
+                Some(o.toString())
             }
         })
         then:
         opStr == Some('1')
+    }
+
+    def "Some(2).contains(1) should return 'false'"(){
+        expect: !Some(2).contains(1)
+    }
+
+    def "Some(2).contains(2) should return 'true'"(){
+        expect: Some(2).contains(2)
+    }
+
+    def "call contains with any argument on None() should return 'false'"(){
+        expect: !None().contains("a") && !None().contains(1) && !None().contains(Some(2))
+    }
+
+    def "Some(2).exist(x -> x ==2) should return 'true'"(){
+        expect: Some(2).exist(new Predicate<Integer>() {
+            @Override
+            boolean test(Integer integer) {
+                integer.equals(2)
+            }
+        })
+    }
+
+    def "Some(2).exist(x -> x =='a') should return 'false'"(){
+        expect: !Some(2).exist(new Predicate<Integer>() {
+            @Override
+            boolean test(Integer integer) {
+                integer.equals("a")
+            }
+        })
+    }
+
+    def "None().exist(x -> true) should retutn 'false'"(){
+        expect: !None().exist(new Predicate<String> (){
+            @Override
+            public boolean test(String s){
+                true
+            }
+        })
+    }
+
+    def "Some('2').forall(x -> false) should retutn 'false'"(){
+        expect: !Some("2").forall(new Predicate<String> (){
+            @Override
+            public boolean test(String s){
+                false
+            }
+        })
+    }
+
+    def "None().forall(x -> false) should retutn 'true'"(){
+        expect: None().forall(new Predicate<String> (){
+            @Override
+            public boolean test(String s){
+                false
+            }
+        })
+    }
+
+    def "Some('2').forall(x -> x == '2') should retutn 'false'"(){
+        expect: Some("2").forall(new Predicate<String> (){
+            @Override
+            public boolean test(String s){
+                s.equals("2")
+            }
+        })
+    }
+
+    def "toList on Some(2) should produce List<Integer>(2)"(){
+        when:
+            List<Integer> list = Some(2).toList()
+        then:
+            list == [2]
+    }
+
+    def "toList on None should produce Empty list"(){
+        when: List<Integer> empty = None().toList()
+        then: empty == []
+    }
+
+    def "orNull on None() should produce 'null'"(){
+        expect: None().orNull() == null
+    }
+
+    def "orNull on Some('a') should return 'a'"(){
+        expect: Some("2").orNull()== "2"
     }
 
     def "orElse(2) on Some(1) should return 1"(){

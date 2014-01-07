@@ -6,6 +6,8 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 /**
+ * This object represents non-existent values.
+ *
  * User: Dmitrii Fateev
  * Date: 06.01.14
  * Email: <a href="mailto:dsfateev@luxoft.com"></a>
@@ -21,8 +23,7 @@ public class None extends Option {
      */
     private static final None EMPTY = new None();
 
-    private None() {
-    }
+    private None() {}
 
     @Override
     public Object get() {
@@ -34,7 +35,7 @@ public class None extends Option {
         return false;
     }
 
-    public static None None() {
+    public static Option None() {
         return EMPTY;
     }
 

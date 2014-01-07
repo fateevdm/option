@@ -3,7 +3,15 @@ package option;
 import java.util.Iterator;
 import java.util.Objects;
 
-public class Some<T> extends Option<T> {
+/**
+ * Class Some represents existing values of type T.
+ *
+ * User: Dmitry Fateev
+ * Date: 06.01.14
+ * Email: <a href="mailto:wearing.fateev@gmail.com"></a>
+ */
+
+public final class Some<T> extends Option<T> {
 
     private final T value;
 
@@ -11,7 +19,15 @@ public class Some<T> extends Option<T> {
         this.value = Objects.requireNonNull(value);
     }
 
-    public static <T> Some<T> Some(T value) {
+    /**
+     * Returns an {@code Option} with the specified present non-null value.
+     *
+     * @param <T> the class of the value
+     * @param value the value to be present, which must be non-null
+     * @return an {@code Option} with the value present
+     * @throws NullPointerException if value is null
+     */
+    public static <T> Option<T> Some(T value) {
         return new Some<T>(Objects.requireNonNull(value));
     }
 
