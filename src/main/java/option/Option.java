@@ -32,9 +32,10 @@ import static option.Some.Some;
  * {@code Option} may have unpredictable results and should be avoided.
  * <p/>
  * <p/>
- * User: Dmitry Fateev
- * Date: 06.01.14
- * Email: <a href="mailto:wearing.fateev@gmail.com"></a>
+ *
+ * @author Dmitry Fateev
+ *         Email: <a href="mailto:wearing.fateev@gmail.com"></a>
+ * @since 06.01.14
  */
 public abstract class Option<T> implements Iterable<T> {
 
@@ -65,18 +66,18 @@ public abstract class Option<T> implements Iterable<T> {
     }
 
     /**
-     * Returns an empty {@code Option} instance.  No value is present for this
+     * Returns a {@code None} instance.  No value is present for this
      * Option.
      * <p/>
      * Though it may be tempting to do so, avoid testing if an object
-     * is empty by comparing with {@code ==} against instances returned by
-     * {@code Option.empty()}. There is no guarantee that it is a singleton.
+     * is none by comparing with {@code ==} against instances returned by
+     * {@code Option.none()}. There is no guarantee that it is a singleton.
      * Instead, use {@link #isPresent()}.
      *
      * @param <T> Type of the non-existent value
-     * @return an empty {@code Option}
+     * @return an {@code None}
      */
-    public static <T> Option<T> empty() {
+    private static <T> Option<T> none() {
         @SuppressWarnings("unchecked")
         Option<T> t = None();
         return t;
@@ -84,15 +85,15 @@ public abstract class Option<T> implements Iterable<T> {
 
     /**
      * Returns an {@code Option} describing the specified value, if non-null,
-     * otherwise returns an empty {@code Option}.
+     * otherwise returns a {@code None}.
      *
      * @param <T>   the class of the value
      * @param value the possibly-null value to describe
      * @return an {@code Option} with a present value if the specified value
-     * is non-null, otherwise an empty {@code Option}
+     * is non-null, otherwise a {@code None}
      */
     public static <T> Option<T> ofNullable(T value) {
-        if (value == null) return empty();
+        if (value == null) return none();
         else return Some(value);
     }
 
@@ -110,21 +111,18 @@ public abstract class Option<T> implements Iterable<T> {
 
     /**
      * If a value is present, and the value matches the given predicate,
-     * return an {@code Option} describing the value, otherwise return an
-     * empty {@code Option}.
+     * return an {@code Option} describing the value, otherwise return a
+     * {@code None}.
      *
-     * @param predicate a predicate to apply to the value, if present
+     * @param p a predicate to apply to the value, if present
      * @return an {@code Option} describing the value of this {@code Option}
      * if a value is present and the value matches the given predicate,
-     * otherwise an empty {@code Option}
+     * otherwise a {@code None}
      * @throws NullPointerException if the predicate is null
      */
-    public final Option<T> filter(Predicate<? super T> predicate) {
-        Objects.requireNonNull(predicate);
-        if (isPresent()) {
-            if (predicate.test(this.get())) return this;
-            else return empty();
-        } else return empty();
+    public final Option<T> filter(Predicate<? super T> p) {
+        if (isPresent() && p.test(this.get())) return this;
+        else return none();
     }
 
     /**
@@ -132,34 +130,34 @@ public abstract class Option<T> implements Iterable<T> {
      * this {@code option}'s value returns {@code false}. Otherwise, return {@code None}.
      *
      * @param p the predicate used for testing.
+     * @throws NullPointerException if the predicate is null
      */
     public final Option<T> filterNot(Predicate<? super T> p) {
         if (isEmpty() || !p.test(this.get())) return this;
-        else return empty();
+        else return none();
     }
 
     /**
      * If a value is present, apply the provided mapping function to it,
      * and if the result is non-null, return an {@code Option} describing the
-     * result.  Otherwise return an empty {@code Option}.
+     * result.  Otherwise return a {@code None}.
      *
      * @param <U>    The type of the result of the mapping function
      * @param mapper a mapping function to apply to the value, if present
      * @return an {@code Option} describing the result of applying a mapping
      * function to the value of this {@code Option}, if a value is present,
-     * otherwise an empty {@code Option}
+     * otherwise a {@code None}
      * @throws NullPointerException if the mapping function is null
      */
     public final <U> Option<U> map(Function<? super T, ? extends U> mapper) {
-        Objects.requireNonNull(mapper);
-        if (isEmpty()) return empty();
+        if (isEmpty()) return none();
         else return ofNullable(mapper.apply(this.get()));
     }
 
     /**
      * If a value is present, apply the provided {@code Option}-bearing
-     * mapping function to it, return that result, otherwise return an empty
-     * {@code Option}.  This method is similar to {@link #map(Function)},
+     * mapping function to it, return that result, otherwise return a
+     * {@code None}.  This method is similar to {@link #map(Function)},
      * but the provided mapper is one whose result is already an {@code Option},
      * and if invoked, {@code flatMap} does not wrap it with an additional
      * {@code Option}.
@@ -169,13 +167,12 @@ public abstract class Option<T> implements Iterable<T> {
      *               the mapping function
      * @return the result of applying an {@code Option}-bearing mapping
      * function to the value of this {@code Option}, if a value is present,
-     * otherwise an empty {@code Option}
+     * otherwise a {@code None}
      * @throws NullPointerException if the mapping function is null or returns
      *                              a null result
      */
     public final <U> Option<U> flatMap(Function<? super T, ? extends Option<U>> mapper) {
-        Objects.requireNonNull(mapper);
-        if (isEmpty()) return empty();
+        if (isEmpty()) return none();
         else return Objects.requireNonNull(mapper.apply(this.get()));
     }
 
@@ -196,16 +193,18 @@ public abstract class Option<T> implements Iterable<T> {
      * Otherwise, returns {@code false}.
      *
      * @param p the predicate to test
+     * @throws NullPointerException if the predicate is null
      */
     public final boolean exist(Predicate<? super T> p) {
         return !isEmpty() && p.test(this.get());
     }
 
     /**
-     * Returns {@code true} if this option is empty '''or''' the predicate
+     * Returns {@code true} if this option is None '''or''' the predicate
      * {@code p} returns {@code true} when applied to this {@code option}'s value.
      *
      * @param p the predicate to test
+     * @throws NullPointerException if the predicate is null
      */
     public final boolean forall(Predicate<? super T> p) {
         return isEmpty() || p.test(this.get());
@@ -213,7 +212,7 @@ public abstract class Option<T> implements Iterable<T> {
 
     /**
      * Returns a singleton list containing the {@code option}'s value
-     * if it is nonempty, or the empty list if the {@code option} is empty.
+     * if it is nonempty, or the None list if the {@code option} is none.
      */
     public final List<T> toList() {
         if (isEmpty()) return Collections.emptyList();
@@ -233,13 +232,13 @@ public abstract class Option<T> implements Iterable<T> {
 
     /**
      * Returns the option's value if it is nonempty,
-     * or {@code null} if it is empty.
+     * or {@code null} if it is None.
      * Although the use of null is discouraged, code written to use
      * {@code option} must often interface with code that expects and returns nulls.
      * Example:
      * <pre>{@code
-     *     Option<String> initalText = getInitialText();
-     *     JComponent textField = new JComponent(initalText.orNull,20)
+     *     Option<String> initialText = getInitialText();
+     *     JComponent textField = new JComponent(initialText.orNull,20)
      * }</pre>
      */
     public final T orNull() {

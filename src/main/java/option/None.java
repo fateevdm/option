@@ -3,16 +3,15 @@ package option;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 
 /**
  * This object represents non-existent values.
  *
- * User: Dmitrii Fateev
- * Date: 06.01.14
- * Email: <a href="mailto:dsfateev@luxoft.com"></a>
+ * @author Dmitrii Fateev
+ *         Email: <a href="mailto:dsfateev@luxoft.com"></a>
+ * @since 06.01.14
  */
-public class None extends Option {
+public final class None extends Option {
     @Override
     public Iterator iterator() {
         return Collections.emptyIterator();
@@ -23,7 +22,8 @@ public class None extends Option {
      */
     private static final None EMPTY = new None();
 
-    private None() {}
+    private None() {
+    }
 
     @Override
     public Object get() {
@@ -51,12 +51,6 @@ public class None extends Option {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (!(obj instanceof None)) return false;
-
-        None other = (None) obj;
-        return Objects.equals(EMPTY, other);
-
+        return this == obj;
     }
 }

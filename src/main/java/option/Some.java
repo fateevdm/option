@@ -1,14 +1,13 @@
 package option;
 
 import java.util.Iterator;
-import java.util.Objects;
 
 /**
  * Class Some represents existing values of type T.
  *
- * User: Dmitry Fateev
- * Date: 06.01.14
- * Email: <a href="mailto:wearing.fateev@gmail.com"></a>
+ * @author Dmitrii Fateev
+ *         Email: <a href="mailto:wearing.fateev@gmail.com"></a>
+ * @since 06.01.14
  */
 
 public final class Some<T> extends Option<T> {
@@ -16,7 +15,7 @@ public final class Some<T> extends Option<T> {
     private final T value;
 
     private Some(T value) {
-        this.value = Objects.requireNonNull(value);
+        this.value = value;
     }
 
     /**
@@ -28,7 +27,8 @@ public final class Some<T> extends Option<T> {
      * @throws NullPointerException if value is null
      */
     public static <T> Option<T> Some(T value) {
-        return new Some<T>(Objects.requireNonNull(value));
+        if (value == null) throw new NullPointerException("value should not be bull");
+        return new Some<T>(value);
     }
 
     @Override
@@ -66,10 +66,10 @@ public final class Some<T> extends Option<T> {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(value);
+        return value.hashCode();
     }
 
-    private class OptionIter<T> implements Iterator<T> {
+    private static class OptionIter<T> implements Iterator<T> {
         private boolean hasNext = true;
         private final T elem;
 

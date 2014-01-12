@@ -36,7 +36,7 @@ class OptionSpec extends Specification{
 
     def "get from None should throw NoSuchElementException"(){
         when: None().get()
-        then: NoSuchElementException e = thrown()
+        then: thrown(NoSuchElementException)
     }
 
     def "isEmpty on Some should be false"(){
@@ -301,7 +301,7 @@ class OptionSpec extends Specification{
             }
         })
         then:
-            Exception e = thrown()
+            thrown(Exception)
     }
 
     def "two different None should be Equal"(){
