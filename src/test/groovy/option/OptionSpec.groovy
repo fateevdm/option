@@ -1,12 +1,14 @@
 package option
 
 import spock.lang.Specification
+import utils.Consumer
 import utils.Function
 import utils.Predicate
 import utils.Supplier
 
-import static option.None.None
-import static option.Some.Some
+import static option.Option.None
+import static option.Option.Some
+
 /**
  * User: Dmitry Fateev
  * Date: 06.01.14
@@ -323,5 +325,15 @@ class OptionSpec extends Specification{
             map.put(op2, 2)
         then: map.get(op1) == 2
         then: op1.equals(op2) && op1.hashCode() == op2.hashCode()
+    }
+
+    def "For Some(a) or None call method 'foreach' should not throws any exception"(){
+        when: Some(1).foreach(new Consumer<Integer>() {
+            @Override
+            void accept(Integer integer) {
+                 println(integer)
+            }
+        })
+        then: noExceptionThrown()
     }
 }

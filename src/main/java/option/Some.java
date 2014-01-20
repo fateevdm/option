@@ -10,25 +10,12 @@ import java.util.Iterator;
  * @since 06.01.14
  */
 
-public final class Some<T> extends Option<T> {
+final class Some<T> extends Option<T> {
 
     private final T value;
 
-    private Some(T value) {
+    Some(T value) {
         this.value = value;
-    }
-
-    /**
-     * Returns an {@code Option} with the specified present non-null value.
-     *
-     * @param <T>   the class of the value
-     * @param value the value to be present, which must be non-null
-     * @return an {@code Option} with the value present
-     * @throws NullPointerException if value is null
-     */
-    public static <T> Option<T> Some(T value) {
-        if (value == null) throw new NullPointerException("value should not be bull");
-        return new Some<T>(value);
     }
 
     @Override

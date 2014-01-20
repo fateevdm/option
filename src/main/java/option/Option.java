@@ -9,9 +9,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import static option.None.None;
-import static option.Some.Some;
-
 /**
  * This is implementation of optional value based on Optional.java from JDK 8
  * and Option.scala from Scala SDK.
@@ -38,6 +35,8 @@ import static option.Some.Some;
  * @since 06.01.14
  */
 public abstract class Option<T> implements Iterable<T> {
+
+    protected Option(){}
 
     /**
      * If a value is present in this {@code Option}, returns the value,
@@ -74,13 +73,23 @@ public abstract class Option<T> implements Iterable<T> {
      * {@code Option.none()}. There is no guarantee that it is a singleton.
      * Instead, use {@link #isPresent()}.
      *
-     * @param <T> Type of the non-existent value
      * @return an {@code None}
      */
-    private static <T> Option<T> none() {
-        @SuppressWarnings("unchecked")
-        Option<T> t = None();
-        return t;
+    public static Option None() {
+        return None.empty();
+    }
+
+    /**
+     * Returns an {@code Option} with the specified present non-null value.
+     *
+     * @param <T>   the class of the value
+     * @param value the value to be present, which must be non-null
+     * @return an {@code Option} with the value present
+     * @throws NullPointerException if value is null
+     */
+    public static <T> Option<T> Some(T value) {
+        if (value == null) throw new NullPointerException("value should not be bull");
+        return new Some<T>(value);
     }
 
     /**
@@ -93,7 +102,7 @@ public abstract class Option<T> implements Iterable<T> {
      * is non-null, otherwise a {@code None}
      */
     public static <T> Option<T> ofNullable(T value) {
-        if (value == null) return none();
+        if (value == null) return None.empty();
         else return Some(value);
     }
 
@@ -122,7 +131,7 @@ public abstract class Option<T> implements Iterable<T> {
      */
     public final Option<T> filter(Predicate<? super T> p) {
         if (isPresent() && p.test(this.get())) return this;
-        else return none();
+        else return None.empty();
     }
 
     /**
@@ -134,7 +143,7 @@ public abstract class Option<T> implements Iterable<T> {
      */
     public final Option<T> filterNot(Predicate<? super T> p) {
         if (isEmpty() || !p.test(this.get())) return this;
-        else return none();
+        else return None.empty();
     }
 
     /**
@@ -150,7 +159,7 @@ public abstract class Option<T> implements Iterable<T> {
      * @throws NullPointerException if the mapping function is null
      */
     public final <U> Option<U> map(Function<? super T, ? extends U> mapper) {
-        if (isEmpty()) return none();
+        if (isEmpty()) return None.empty();
         else return ofNullable(mapper.apply(this.get()));
     }
 
@@ -172,7 +181,7 @@ public abstract class Option<T> implements Iterable<T> {
      *                              a null result
      */
     public final <U> Option<U> flatMap(Function<? super T, ? extends Option<U>> mapper) {
-        if (isEmpty()) return none();
+        if (isEmpty()) return None.empty();
         else return Objects.requireNonNull(mapper.apply(this.get()));
     }
 
