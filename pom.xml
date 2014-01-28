@@ -10,8 +10,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version.source>1.6</java.version.source>
-        <java.version.target>1.6</java.version.target>
+        <java.version.source>1.8</java.version.source>
+        <java.version.target>1.8</java.version.target>
     </properties>
 
 
@@ -52,10 +52,31 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.16</version>
                 </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>2.2.1</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <configuration>
+                    <outputDirectory>${project.basedir}/target/source</outputDirectory>
+                    <finalName>${artifactId}-${version}-source</finalName>
+                    <attach>true</attach>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -149,6 +170,11 @@
             <artifactId>spock-core</artifactId>
             <version>0.7-groovy-1.8</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>15.0</version>
         </dependency>
 
     </dependencies>

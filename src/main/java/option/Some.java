@@ -35,9 +35,9 @@ final class Some<T> extends Option<T> {
 
     @Override
     public String toString() {
-        return "Some{ " +
+        return "Some{" +
                 value +
-                " }";
+                "}";
     }
 
     @Override
