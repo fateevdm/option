@@ -4,8 +4,6 @@ import option.Option;
 import utils.*;
 import utils.control.Errors;
 
-import java.util.concurrent.Callable;
-
 import static option.Option.None;
 import static option.Option.Some;
 
@@ -59,22 +57,22 @@ public abstract class Try<T> {
     public abstract < X extends Throwable> Try<? super T> recoverWith(FunctionEx<Throwable, ? extends Try<T>> rescueException) throws X;
 
     @SuppressWarnings("unchecked")
-    public <X extends Throwable> T getOrElse(Callable<? extends T> def) throws X {
+    public <X extends Throwable> T getOrElse(SupplierX<? extends T> def) throws X {
         if (isFailure()) try {
-            return def.call();
-        } catch (Exception e) {
+            return def.get();
+        } catch (Throwable e) {
             throw (X)e;
         }
         else return get();
     }
 
-    public Try<? super T> orElse(Callable<Try<? super T>> def){
+    public Try<? super T> orElse(SupplierX<Try<? super T>> def){
         if (isSuccess()) return this;
         else try {
-            return def.call();
-        } catch (Exception e) {
+            return def.get();
+        } catch (Throwable e) {
             if (Errors.isNonFatal(e)) return Failure(e);
-            else throw new RuntimeException(e.getCause());
+            else throw e;
         }
     }
 
