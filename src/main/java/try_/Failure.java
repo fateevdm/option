@@ -8,7 +8,7 @@ import utils.control.Errors;
  * Date: 25.01.14
  * E-mail: wearing.fateev@gmail.com
  */
-public final class Failure<T> extends Try<T> {
+final class Failure<T> extends Try<T> {
 
     private final Throwable exception;
 
@@ -54,15 +54,15 @@ public final class Failure<T> extends Try<T> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <U, X extends Throwable> Try<U> map(FunctionEx<? super T, ? extends U> f) throws X{
+    public <U> Try<U> map(FunctionEx<? super T,? extends U> f){
         return (Try<U>) this;
     }
 
     @Override
-    public Try<? super T> recover(Function<Throwable, ? extends T> rescueException) {
+    public Try<T> recover(final FunctionEx<Throwable, ? extends T> rescueException) {
         return Try.asTry(new SupplierX<T>() {
             @Override
-            public <X extends Throwable> T get() throws X {
+            public T get() throws Throwable {
                 return rescueException.apply(exception);
             }
         });
@@ -70,12 +70,12 @@ public final class Failure<T> extends Try<T> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <X extends Throwable> Try<? super T> recoverWith(FunctionEx<Throwable, ? extends Try<T>> rescueException) throws X {
+    public Try<T> recoverWith(FunctionEx<Throwable, ? extends Try<T>> rescueException) {
         try {
             return rescueException.apply(exception);
         } catch (Throwable t) {
-            if (Errors.isNonFatal(t)) return Failure(t);
-            else throw (X) t;
+            if (Errors.isFatal(t)) Errors.throwAsUnchecked(t);
+            return Failure(t);
         }
     }
 

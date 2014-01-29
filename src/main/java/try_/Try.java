@@ -17,18 +17,18 @@ public abstract class Try<T> {
     protected Try(){}
 
     @SuppressWarnings("unchecked")
-    public static <T, X extends Throwable> Try<T> asTry(SupplierX<? extends T> block) throws X{
+    public static <T> Try<T> asTry(SupplierX<? extends T> block) {
           try {
               return Success(block.get());
           } catch (Throwable t){
-              if (Errors.isNonFatal(t)) return Failure(t);
-              else throw (X)t;
+              if (Errors.isFatal(t)) Errors.<RuntimeException>throwAny(t);
+              return Failure(t);
           }
     }
 
     @SuppressWarnings("unchecked")
-    public static <T, X extends Throwable> Try<T> Success(T value) throws X{
-        if (value instanceof Throwable) throw (X)value;
+    public static <T, X extends RuntimeException> Try<T> Success(T value){
+        if (value instanceof Throwable) Errors.<X>throwAny((Throwable)value);
         return new Success<T>(value);
     }
 
@@ -50,20 +50,21 @@ public abstract class Try<T> {
 
     public abstract void foreach(Consumer<? super T> f);
 
-    public abstract <U, X extends Throwable> Try<U> map(FunctionEx<? super T,? extends U> f) throws X;
+    public abstract <U> Try<U> map(FunctionEx<? super T,? extends U> f);
 
-    public abstract Try<? super T> recover(Function<Throwable, ? extends T> f);
+    public abstract Try<T> recover(FunctionEx<Throwable, ? extends T> f);
 
-    public abstract < X extends Throwable> Try<? super T> recoverWith(FunctionEx<Throwable, ? extends Try<T>> rescueException) throws X;
+    public abstract Try<T> recoverWith(FunctionEx<Throwable, ? extends Try<T>> rescueException);
 
     @SuppressWarnings("unchecked")
-    public <X extends Throwable> T getOrElse(SupplierX<? extends T> def) throws X {
-        if (isFailure()) try {
+    public T getOrElse(SupplierX<? extends T> def){
+        if (isSuccess()) return ((Success<T>)this).get();
+        else try {
             return def.get();
-        } catch (Throwable e) {
-            throw (X)e;
+        } catch (Throwable throwable) {
+            Errors.throwAsUnchecked(throwable);
         }
-        else return get();
+        return null;
     }
 
     public Try<? super T> orElse(SupplierX<Try<? super T>> def){
@@ -71,20 +72,23 @@ public abstract class Try<T> {
         else try {
             return def.get();
         } catch (Throwable e) {
-            if (Errors.isNonFatal(e)) return Failure(e);
-            else throw e;
+            if (Errors.isFatal(e)) Errors.throwAsUnchecked(e);
+            return Failure(e);
         }
     }
 
     @SuppressWarnings("unchecked")
     public Option<T> toOption(){
         if (isFailure()) return None();
-        else return Some(get());
+        else return Some(((Success<T>)this).get());
     }
 
-    public <U> Try<U> transform(Function<? super T, ? extends Try<U>> s, FunctionEx<Throwable, ? extends Try<U>> f){
+    public <U> Try<U> transform(Function<? super T, ? extends Try<U>> s, Function<Throwable, ? extends Try<U>> f){
         if (isSuccess()) return flatMap(s);
-        else return f.apply(failed().get());
+        else {
+            Try<Throwable> t =this.failed();
+            return f.apply(((Success<Throwable>) t).get());
+        }
     }
 
 }

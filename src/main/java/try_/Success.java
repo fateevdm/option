@@ -10,11 +10,11 @@ import java.util.NoSuchElementException;
  * Date: 25.01.14
  * E-mail: wearing.fateev@gmail.com
  */
-public final class Success<T> extends Try<T> {
+final class Success<T> extends Try<T> {
 
     private final T value;
 
-    protected Success(T value){
+    protected Success(T value) {
         this.value = value;
     }
 
@@ -43,9 +43,9 @@ public final class Success<T> extends Try<T> {
         try {
             if (p.test(value)) return this;
             else return Failure(new NoSuchElementException("Predicate does not hold for " + value));
-        } catch (Throwable t){
-            if (Errors.isNonFatal(t)) return Failure(t);
-            else throw t;
+        } catch (Throwable t) {
+            if (Errors.isFatal(t)) Errors.throwAsUnchecked(t);
+            return Failure(t);
         }
 
     }
@@ -54,9 +54,9 @@ public final class Success<T> extends Try<T> {
     public <U> Try<U> flatMap(Function<? super T, ? extends Try<U>> f) {
         try {
             return f.apply(value);
-        }catch (Throwable t){
-            if (Errors.isNonFatal(t)) return Failure(t);
-            else throw t;
+        } catch (Throwable t) {
+            if (Errors.isFatal(t)) Errors.throwAsUnchecked(t);
+            return Failure(t);
         }
     }
 
@@ -66,22 +66,22 @@ public final class Success<T> extends Try<T> {
     }
 
     @Override
-    public <U, X extends Throwable> Try<U> map(FunctionEx<? super T, ? extends U> f) throws X{
+    public <U> Try<U> map(final FunctionEx<? super T, ? extends U> f) {
         return Try.asTry(new SupplierX<U>() {
             @Override
-            public <X extends Throwable> U get() throws X {
+            public U get() throws Throwable {
                 return f.apply(value);
             }
         });
     }
 
     @Override
-    public Try<? super T> recover(Function<Throwable, ? extends T> f) {
+    public Try<T> recover(FunctionEx<Throwable, ? extends T> f) {
         return this;
     }
 
     @Override
-    public <X extends Throwable> Try<? super T> recoverWith(FunctionEx<Throwable, ? extends Try<T>> rescueException) throws X{
+    public Try<T> recoverWith(FunctionEx<Throwable, ? extends Try<T>> rescueException) {
         return this;
     }
 
