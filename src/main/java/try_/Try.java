@@ -46,13 +46,13 @@ public abstract class Try<T> {
 
     public abstract Try<T> filter(Predicate<? super T> p);
 
-    public abstract<U> Try<U> flatMap(Function<? super T, ? extends Try<U>> f);
+    public abstract<U> Try<U> flatMap(FunctionEx<? super T, ? extends Try<U>> f);
 
     public abstract void foreach(Consumer<? super T> f);
 
     public abstract <U> Try<U> map(FunctionEx<? super T,? extends U> f);
 
-    public abstract Try<T> recover(Function<Throwable, ? extends T> f);
+    public abstract Try<T> recover(FunctionEx<Throwable, ? extends T> f);
 
     public abstract Try<T> recoverWith(FunctionEx<Throwable, ? extends Try<T>> rescueException);
 
@@ -69,8 +69,8 @@ public abstract class Try<T> {
         else try {
             return def.get();
         } catch (Throwable e) {
-            if (Errors.isNonFatal(e)) return Failure(e);
-            else throw e;
+            if (Errors.isFatal(e)) Errors.throwAsUnchecked(e);
+            return Failure(e);
         }
     }
 
@@ -80,7 +80,7 @@ public abstract class Try<T> {
         else return Some(get());
     }
 
-    public <U> Try<U> transform(Function<? super T, ? extends Try<U>> s, FunctionEx<Throwable, ? extends Try<U>> f){
+    public <U> Try<U> transform(FunctionEx<? super T, ? extends Try<U>> s, FunctionEx<Throwable, ? extends Try<U>> f){
         if (isSuccess()) return flatMap(s);
         else return f.apply(failed().get());
     }

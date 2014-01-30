@@ -43,7 +43,7 @@ final class Failure<T> extends Try<T> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <U> Try<U> flatMap(Function<? super T, ? extends Try<U>> f) {
+    public <U> Try<U> flatMap(FunctionEx<? super T, ? extends Try<U>> f) {
         return (Try<U>) this;
     }
 
@@ -59,7 +59,7 @@ final class Failure<T> extends Try<T> {
     }
 
     @Override
-    public Try<T> recover(Function<Throwable, ? extends T> rescueException) {
+    public Try<T> recover(final FunctionEx<Throwable, ? extends T> rescueException) {
         return Try.asTry(new SupplierX<T>() {
             @Override
             public <X extends Throwable> T get() throws X {

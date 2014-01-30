@@ -44,19 +44,19 @@ final class Success<T> extends Try<T> {
             if (p.test(value)) return this;
             else return Failure(new NoSuchElementException("Predicate does not hold for " + value));
         } catch (Throwable t){
-            if (Errors.isNonFatal(t)) return Failure(t);
-            else throw t;
+            if (Errors.isFatal(t)) Errors.throwAsUnchecked(t);
+            return Failure(t);
         }
 
     }
 
     @Override
-    public <U> Try<U> flatMap(Function<? super T, ? extends Try<U>> f) {
+    public <U> Try<U> flatMap(FunctionEx<? super T, ? extends Try<U>> f) {
         try {
             return f.apply(value);
         }catch (Throwable t){
-            if (Errors.isNonFatal(t)) return Failure(t);
-            else throw t;
+            if (Errors.isFatal(t)) Errors.throwAsUnchecked(t);
+            return Failure(t);
         }
     }
 
@@ -66,17 +66,17 @@ final class Success<T> extends Try<T> {
     }
 
     @Override
-    public <U> Try<U> map(FunctionEx<? super T, ? extends U> f) {
+    public <U> Try<U> map(final FunctionEx<? super T, ? extends U> f) {
         return Try.asTry(new SupplierX<U>() {
             @Override
-            public <X extends Throwable> U get() throws X {
+            public U get() throws Throwable {
                 return f.apply(value);
             }
         });
     }
 
     @Override
-    public Try<T> recover(Function<Throwable, ? extends T> f) {
+    public Try<T> recover(FunctionEx<Throwable, ? extends T> f) {
         return this;
     }
 
