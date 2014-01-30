@@ -27,8 +27,8 @@ final class Failure<T> extends Try<T> {
     }
 
     @Override
-    public T get() throws Throwable {
-        throw exception;
+    public T get() {
+        throw (RuntimeException)exception;
     }
 
     @Override
@@ -43,7 +43,7 @@ final class Failure<T> extends Try<T> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <U> Try<U> flatMap(Function<? super T, ? extends Try<U>> f) {
+    public <U> Try<U> flatMap(FunctionEx<? super T,? extends Try<U>> f) {
         return (Try<U>) this;
     }
 

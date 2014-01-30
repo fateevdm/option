@@ -21,14 +21,14 @@ public abstract class Try<T> {
           try {
               return Success(block.get());
           } catch (Throwable t){
-              if (Errors.isFatal(t)) Errors.<RuntimeException>throwAny(t);
+              if (Errors.isFatal(t)) Errors.throwAsUnchecked(t);
               return Failure(t);
           }
     }
 
     @SuppressWarnings("unchecked")
-    public static <T, X extends RuntimeException> Try<T> Success(T value){
-        if (value instanceof Throwable) Errors.<X>throwAny((Throwable)value);
+    public static <T> Try<T> Success(T value){
+        if (value instanceof Throwable) Errors.throwAsUnchecked((Throwable) value);
         return new Success<T>(value);
     }
 
@@ -40,13 +40,13 @@ public abstract class Try<T> {
 
     public abstract boolean isSuccess();
 
-    public abstract <X extends Throwable> T get() throws X;
+    public abstract T get();
 
     public abstract Try<Throwable> failed();
 
     public abstract Try<T> filter(Predicate<? super T> p);
 
-    public abstract<U> Try<U> flatMap(Function<? super T, ? extends Try<U>> f);
+    public abstract<U> Try<U> flatMap(FunctionEx<? super T, ? extends Try<U>> f);
 
     public abstract void foreach(Consumer<? super T> f);
 
@@ -58,7 +58,7 @@ public abstract class Try<T> {
 
     @SuppressWarnings("unchecked")
     public T getOrElse(SupplierX<? extends T> def){
-        if (isSuccess()) return ((Success<T>)this).get();
+        if (isSuccess()) return this.get();
         else try {
             return def.get();
         } catch (Throwable throwable) {
@@ -80,14 +80,14 @@ public abstract class Try<T> {
     @SuppressWarnings("unchecked")
     public Option<T> toOption(){
         if (isFailure()) return None();
-        else return Some(((Success<T>)this).get());
+        else return Some(this.get());
     }
 
-    public <U> Try<U> transform(Function<? super T, ? extends Try<U>> s, Function<Throwable, ? extends Try<U>> f){
+    public <U> Try<U> transform(FunctionEx<? super T, ? extends Try<U>> s, Function<Throwable, ? extends Try<U>> f){
         if (isSuccess()) return flatMap(s);
         else {
             Try<Throwable> t =this.failed();
-            return f.apply(((Success<Throwable>) t).get());
+            return f.apply(t.get());
         }
     }
 

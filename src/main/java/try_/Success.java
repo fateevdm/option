@@ -51,7 +51,7 @@ final class Success<T> extends Try<T> {
     }
 
     @Override
-    public <U> Try<U> flatMap(Function<? super T, ? extends Try<U>> f) {
+    public <U> Try<U> flatMap(FunctionEx<? super T, ? extends Try<U>> f) {
         try {
             return f.apply(value);
         } catch (Throwable t) {
