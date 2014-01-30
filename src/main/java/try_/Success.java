@@ -10,7 +10,7 @@ import java.util.NoSuchElementException;
  * Date: 25.01.14
  * E-mail: wearing.fateev@gmail.com
  */
-public final class Success<T> extends Try<T> {
+final class Success<T> extends Try<T> {
 
     private final T value;
 
@@ -66,7 +66,7 @@ public final class Success<T> extends Try<T> {
     }
 
     @Override
-    public <U, X extends Throwable> Try<U> map(FunctionEx<? super T, ? extends U> f) throws X{
+    public <U> Try<U> map(FunctionEx<? super T, ? extends U> f) {
         return Try.asTry(new SupplierX<U>() {
             @Override
             public <X extends Throwable> U get() throws X {
@@ -76,12 +76,12 @@ public final class Success<T> extends Try<T> {
     }
 
     @Override
-    public Try<? super T> recover(Function<Throwable, ? extends T> f) {
+    public Try<T> recover(Function<Throwable, ? extends T> f) {
         return this;
     }
 
     @Override
-    public <X extends Throwable> Try<? super T> recoverWith(FunctionEx<Throwable, ? extends Try<T>> rescueException) throws X{
+    public  Try<T> recoverWith(FunctionEx<Throwable, ? extends Try<T>> rescueException){
         return this;
     }
 
