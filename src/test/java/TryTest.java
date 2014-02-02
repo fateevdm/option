@@ -5,8 +5,8 @@ import com.google.common.io.Files;
 import org.junit.Assert;
 import org.junit.Test;
 import try_.Try;
-import utils.FunctionEx;
-import utils.SupplierX;
+import utils.function.exceptional.FunctionEx;
+import utils.function.exceptional.SupplierEx;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,21 +24,21 @@ public class TryTest {
 
     @Test(expected = InterruptedException.class)
     public void testAsExampleForTry() {
-        System.out.println(Try.asTry(new SupplierX<String>() {
+        System.out.println(Try.asTry(new SupplierEx<String>() {
             @Override
             public String get() throws IOException {
                 throw new IOException();
             }
         }).recover(new FunctionEx<Throwable, String>() {
             @Override
-            public <X extends Throwable> String apply(Throwable input) throws X {
+            public String apply(Throwable input) throws Exception {
                 return input.toString();
             }
         }));
 
         Success(5);
 
-        Assert.assertSame(55, Try.asTry(new SupplierX<File>() {
+        Assert.assertSame(55, Try.asTry(new SupplierEx<File>() {
             @Override
             public File get() throws FileNotFoundException {
                 throw new FileNotFoundException();
@@ -55,7 +55,7 @@ public class TryTest {
             }
         }).map(new FunctionEx<List<String>, List<Integer>>() {
             @Override
-            public <X extends Throwable> List<Integer> apply(List<String> lines) throws X {
+            public List<Integer> apply(List<String> lines) throws Exception {
                 return Lists.transform(lines, new Function<String, Integer>() {
                     @Override
                     public Integer apply(String input) {
@@ -65,19 +65,19 @@ public class TryTest {
             }
         }).map(new FunctionEx<List<Integer>, Integer>() {
             @Override
-            public <X extends Throwable> Integer apply(List<Integer> input) throws X {
+            public Integer apply(List<Integer> input) throws Exception {
                 int sum = 0;
                 for (int x : input) sum += x;
                 return sum;
             }
-        }).getOrElse(new SupplierX<Integer>() {
+        }).getOrElse(new SupplierEx<Integer>() {
             @Override
-            public <X extends Throwable> Integer get() throws X {
+            public Integer get() throws Exception{
                 return 505;
             }
         }));
 
-        Try.asTry(new SupplierX<Object>() {
+        Try.asTry(new SupplierEx<Object>() {
             @Override
             public Object get() throws InterruptedException {
                 throw new InterruptedException();

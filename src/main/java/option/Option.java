@@ -75,7 +75,7 @@ public abstract class Option<T> implements Iterable<T> {
      *
      * @return an {@code None}
      */
-    public static<T> Option<T> None() {
+    public static Option None() {
         return None.empty();
     }
 
@@ -89,7 +89,7 @@ public abstract class Option<T> implements Iterable<T> {
      */
     public static <T> Option<T> Some(T value) {
         if (value == null) throw new NullPointerException("value should not be bull");
-        return new Some<>(value);
+        return new Some<T>(value);
     }
 
     /**
