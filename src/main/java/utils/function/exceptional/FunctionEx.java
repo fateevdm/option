@@ -1,4 +1,4 @@
-package utils;
+package utils.function.exceptional;
 
 /**
  * @author: Dmitrii Fateev
@@ -6,7 +6,8 @@ package utils;
  * @since: 28.01.14
  */
 @FunctionalInterface
-public interface SupplierX<T>  {
+public interface FunctionEx<T, R> {
 
-      <X extends Throwable> T get() throws X;
+     R apply(T input) throws Exception;
+
 }

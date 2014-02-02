@@ -1,4 +1,4 @@
-package utils;
+package utils.function;
 
 /**
  * This is simple version of Java 8 Function. Made for independence from JDK 8
@@ -8,6 +8,7 @@ package utils;
  * @param <T> the type of the input to the function
  * @param <R> the type of the result of the function
  */
+@FunctionalInterface
 public interface Function<T, R> {
 
     /**
