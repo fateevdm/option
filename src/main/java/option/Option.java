@@ -1,9 +1,9 @@
 package option;
 
-import utils.Consumer;
-import utils.Function;
-import utils.Predicate;
-import utils.Supplier;
+import utils.function.Consumer;
+import utils.function.Function;
+import utils.function.Predicate;
+import utils.function.Supplier;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.Objects;
  * <p>Additional methods that depend on the presence or absence of a contained
  * value are provided, such as {@link #orElse(Object) orElse()}
  * (return a default value if value not present) and
- * {@link #foreach(utils.Consumer)} (utils.Consumer)} (execute a block
+ * {@link #foreach(utils.function.Consumer)} (utils.function.Consumer)} (execute a block
  * of code if the value is present).
  * <p/>
  * <p>This is a <a href="../lang/doc-files/ValueBased.html">value-based</a>
@@ -75,7 +75,7 @@ public abstract class Option<T> implements Iterable<T> {
      *
      * @return an {@code None}
      */
-    public static Option None() {
+    public static<T> Option<T> None() {
         return None.empty();
     }
 
@@ -89,7 +89,7 @@ public abstract class Option<T> implements Iterable<T> {
      */
     public static <T> Option<T> Some(T value) {
         if (value == null) throw new NullPointerException("value should not be bull");
-        return new Some<T>(value);
+        return new Some<>(value);
     }
 
     /**

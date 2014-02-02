@@ -1,14 +1,12 @@
 package option
-
 import spock.lang.Specification
-import utils.Consumer
-import utils.Function
-import utils.Predicate
-import utils.Supplier
+import utils.function.Consumer
+import utils.function.Function
+import utils.function.Predicate
+import utils.function.Supplier
 
 import static option.Option.None
 import static option.Option.Some
-
 /**
  * User: Dmitry Fateev
  * Date: 06.01.14
@@ -24,8 +22,7 @@ class OptionSpec extends Specification{
     }
 
     def "isPresent on Some('s') should return 'true'"(){
-        when: Option<String> stringOption = Some("s")
-        then: stringOption.isPresent()
+        expect: Some("s").isPresent()
     }
 
     def "isPresent on None should return 'false'"(){
@@ -50,108 +47,55 @@ class OptionSpec extends Specification{
     }
 
     def "filter on None should produce None"(){
-        expect: None().filter(new Predicate<Integer>() {
-            @Override
-            boolean test(Integer o) {
-                true
-            }
-        }) == None()
+        expect: None().filter({Integer i -> true} as Predicate) == None()
     }
 
     def "filter Some('a') by 'string !=a' should produce None"(){
-        expect: Some('a').filter(new Predicate<String>() {
-            @Override
-            boolean test(String s) {
-                !s.equalsIgnoreCase("a")
-            }
-        }) == None()
+        expect: Some('a').filter({String s -> !s.equalsIgnoreCase('a')} as Predicate) == None()
     }
 
     def "filter Some('a') by 'string ==a' should produce Some('a')"(){
-        expect: Some('a').filter(new Predicate<String>() {
-            @Override
-            boolean test(String s) {
-                s.equalsIgnoreCase("a")
-            }
-        }) == Some("a")
+        expect: Some('a').filter({String s -> s.equalsIgnoreCase('a')} as Predicate) == Some("a")
     }
 
     def "filterNot Some('b') by 'string == a' should return Some('b')"(){
-        expect: Some("b").filterNot(new Predicate<String>() {
-            @Override
-            boolean test(String s) {
-                s.equalsIgnoreCase("a")
-            }
-        }) == Some("b")
+        expect: Some("b").filterNot({String s -> s.equalsIgnoreCase("a")} as Predicate) == Some("b")
     }
 
     def "filterNot Some('b') by 'string == b' should return None()"(){
-        expect: Some("b").filterNot(new Predicate<String>() {
-            @Override
-            boolean test(String s) {
-                s.equalsIgnoreCase("b")
-            }
-        }) == None()
+        expect: Some("b").filterNot({String s -> s.equalsIgnoreCase("b")} as Predicate) == None()
     }
 
     def "filterNot on None should produce None"(){
-        expect: None().filterNot(new Predicate<Integer>() {
-            @Override
-            boolean test(Integer o) {
-                true
-            }
-        }) == None()
+        expect: None().filterNot({it -> true} as Predicate) == None()
     }
 
     def "map function from int to string on Option(1) should produce Option('1')"(){
-        setup:
-             Option<Integer> integerOption = Some(1)
-        when:
-           Option<String> stringOption = integerOption.map(new Function<Integer, String>() {
-                @Override
-                String apply(Integer o) {
-                    o.toString()
-                }
-            })
-        then:
-            stringOption.equals(Some("1"))
+        setup: def integerOption = Some(1)
+        when:  def stringOption = integerOption.map({it -> it.toString()} as Function)
+        then:  stringOption.equals(Some("1"))
     }
 
     def "map function on None should produce None"(){
         when:
             Option<Integer> opInt = None()
-            Option<Integer> opStr = opInt.map(new Function<Integer,Integer>() {
-                @Override
-                Integer apply(Integer o) {
-                    (o.intValue() + 1)
-                }
-            })
+            Option<Integer> opStr = opInt.map({it -> it + 1} as Function)
         then:
             opStr == None()
     }
 
     def "flatMap function on None should produce None"(){
         when:
-        Option<Integer> opInt = None()
-        Option<String> opStr = opInt.flatMap(new Function<Integer,Option<String>>() {
-            @Override
-            Option<String> apply(Integer o) {
-                o == null? None(): Some(o.toString())
-            }
-        })
+        def opInt = None()
+        def opStr = opInt.flatMap({it -> Some(it.toString())} as Function)
         then:
         opStr == None()
     }
 
     def "flatMap function from int to Option<String> on Some(1) should produce Some('1')"(){
         when:
-        Option<Integer> opInt = Some(1)
-        Option<String> opStr = opInt.flatMap(new Function<Integer,Option<String>>() {
-            @Override
-            Option<String> apply(Integer o) {
-                Some(o.toString())
-            }
-        })
+        def opInt = Some(1)
+        def opStr = opInt.flatMap({i -> Some(i.toString())} as Function)
         then:
         opStr == Some('1')
     }
@@ -169,69 +113,35 @@ class OptionSpec extends Specification{
     }
 
     def "Some(2).exist(x -> x ==2) should return 'true'"(){
-        expect: Some(2).exist(new Predicate<Integer>() {
-            @Override
-            boolean test(Integer integer) {
-                integer.equals(2)
-            }
-        })
+        expect: Some(2).exist({int i -> i.equals(2)} as Predicate)
     }
 
     def "Some(2).exist(x -> x =='a') should return 'false'"(){
-        expect: !Some(2).exist(new Predicate<Integer>() {
-            @Override
-            boolean test(Integer integer) {
-                integer.equals("a")
-            }
-        })
+        expect: !Some(2).exist({Integer i -> i.equals("a")} as Predicate<Integer>)
     }
 
     def "None().exist(x -> true) should retutn 'false'"(){
-        expect: !None().exist(new Predicate<String> (){
-            @Override
-            public boolean test(String s){
-                true
-            }
-        })
+        expect: !None().exist({s -> true} as Predicate)
     }
 
     def "Some('2').forall(x -> false) should retutn 'false'"(){
-        expect: !Some("2").forall(new Predicate<String> (){
-            @Override
-            public boolean test(String s){
-                false
-            }
-        })
+        expect: !Some("2").forall({s -> false} as Predicate)
     }
 
     def "None().forall(x -> false) should retutn 'true'"(){
-        expect: None().forall(new Predicate<String> (){
-            @Override
-            public boolean test(String s){
-                false
-            }
-        })
+        expect: None().forall({s -> false} as Predicate)
     }
 
     def "Some('2').forall(x -> x == '2') should retutn 'false'"(){
-        expect: Some("2").forall(new Predicate<String> (){
-            @Override
-            public boolean test(String s){
-                s.equals("2")
-            }
-        })
+        expect: Some("2").forall({String s -> s.equals("2")} as Predicate)
     }
 
     def "toList on Some(2) should produce List<Integer>(2)"(){
-        when:
-            List<Integer> list = Some(2).toList()
-        then:
-            list == [2]
+        expect: Some(2).toList() == [2]
     }
 
     def "toList on None should produce Empty list"(){
-        when: List<Integer> empty = None().toList()
-        then: empty == []
+        expect: None().toList() == []
     }
 
     def "orNull on None() should produce 'null'"(){
@@ -243,67 +153,28 @@ class OptionSpec extends Specification{
     }
 
     def "orElse(2) on Some(1) should return 1"(){
-        when:
-            Option<Integer> op1 = Some(1)
-        then:
-            op1.orElse(2) == 1
+        expect: Some(1).orElse(2) == 1
     }
 
     def "orElse(1) on None should return 1"(){
-        when:
-            Option<Integer> op1 = None()
-        then:
-            op1.orElse(1) == 1
+        expect: None().orElse(1) == 1
     }
 
     def "orElseGet(2) on Some(1) should return 1"(){
-        when:
-        Option<Integer> op1 = Some(1)
-        then:
-        op1.orElseGet(new Supplier<Integer>() {
-            @Override
-            Integer get() {
-                return 2
-            }
-        }) == 1
+        expect: Some(1).orElseGet({2} as Supplier) == 1
     }
 
     def "orElseGet(1) on None should return 1"(){
-        when:
-        Option<Integer> op1 = None()
-        then:
-        op1.orElseGet(new Supplier<Integer>() {
-            @Override
-            Integer get() {
-                return 1
-            }
-        }) == 1
+        expect: None().orElseGet({1} as Supplier) == 1
     }
 
     def "orElseThrow(NoSuchElementException) on Some(1) should return 1"(){
-        when:
-        Option<Integer> op1 = Some(1)
-        then:
-        op1.orElseThrow(new Supplier<Integer>() {
-            @Override
-            Integer get() {
-                throw new NoSuchElementException()
-            }
-        }) == 1
+        expect: Some(1).orElseThrow({throw new NoSuchElementException()} as Supplier) == 1
     }
 
     def "orElseThrow(Exception) on None should throw NoSuchElementException"(){
-        setup:
-        Option<Integer> op1 = None()
-        when:
-        op1.orElseThrow(new Supplier<Integer>() {
-            @Override
-            Integer get() {
-                throw new Exception()
-            }
-        })
-        then:
-            thrown(Exception)
+        when: None().orElseThrow({throw new Exception()} as Supplier)
+        then: thrown(Exception)
     }
 
     def "two different None should be Equal"(){
@@ -328,12 +199,7 @@ class OptionSpec extends Specification{
     }
 
     def "For Some(a) or None call method 'foreach' should not throws any exception"(){
-        when: Some(1).foreach(new Consumer<Integer>() {
-            @Override
-            void accept(Integer integer) {
-                 println(integer)
-            }
-        })
+        when: Some(1).foreach({it -> println(it)} as Consumer)
         then: noExceptionThrown()
     }
 }

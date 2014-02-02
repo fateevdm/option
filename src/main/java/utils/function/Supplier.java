@@ -1,4 +1,4 @@
-package utils;
+package utils.function;
 
 /**
  * There is Supplier from JDK 8. Made for independence from JDK 8
@@ -10,6 +10,7 @@ package utils;
  *
  * @param <T> the type of results supplied by this supplier
  */
+@FunctionalInterface
 public interface Supplier<T> {
 
     /**
