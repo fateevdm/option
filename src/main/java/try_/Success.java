@@ -1,7 +1,10 @@
 package try_;
 
-import utils.*;
 import utils.control.Errors;
+import utils.function.exceptional.ConsumerEx;
+import utils.function.exceptional.FunctionEx;
+import utils.function.exceptional.PredicateEx;
+import utils.function.exceptional.SupplierEx;
 
 import java.util.NoSuchElementException;
 
@@ -39,7 +42,7 @@ final class Success<T> extends Try<T> {
     }
 
     @Override
-    public Try<T> filter(Predicate<? super T> p) {
+    public Try<T> filter(PredicateEx<? super T> p) {
         try {
             if (p.test(value)) return this;
             else return Failure(new NoSuchElementException("Predicate does not hold for " + value));
@@ -61,15 +64,19 @@ final class Success<T> extends Try<T> {
     }
 
     @Override
-    public void foreach(Consumer<? super T> f) {
-        f.accept(value);
+    public void foreach(ConsumerEx<? super T> f) {
+        try {
+            f.accept(value);
+        } catch (Throwable e) {
+            Errors.throwAsUnchecked(e);
+        }
     }
 
     @Override
     public <U> Try<U> map(final FunctionEx<? super T, ? extends U> f) {
-        return Try.asTry(new SupplierX<U>() {
+        return Try.asTry(new SupplierEx<U>() {
             @Override
-            public U get() throws Throwable {
+            public U get() throws Exception {
                 return f.apply(value);
             }
         });
