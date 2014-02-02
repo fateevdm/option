@@ -1,7 +1,10 @@
 package try_;
 
-import utils.*;
 import utils.control.Errors;
+import utils.function.exceptional.ConsumerEx;
+import utils.function.exceptional.FunctionEx;
+import utils.function.exceptional.PredicateEx;
+import utils.function.exceptional.SupplierEx;
 
 /**
  * User: Dmitrii Fateev
@@ -37,7 +40,7 @@ final class Failure<T> extends Try<T> {
     }
 
     @Override
-    public Try<T> filter(Predicate<? super T> p) {
+    public Try<T> filter(PredicateEx<? super T> p) {
         return this;
     }
 
@@ -48,7 +51,7 @@ final class Failure<T> extends Try<T> {
     }
 
     @Override
-    public void foreach(Consumer<? super T> f) {
+    public void foreach(ConsumerEx<? super T> f) {
 
     }
 
@@ -59,10 +62,10 @@ final class Failure<T> extends Try<T> {
     }
 
     @Override
-    public Try<T> recover(final FunctionEx<Throwable, ? extends T> rescueException) {
-        return Try.asTry(new SupplierX<T>() {
+    public Try<T> recover(final FunctionEx<Throwable,? extends T> rescueException) {
+        return Try.asTry(new SupplierEx<T>() {
             @Override
-            public <X extends Throwable> T get() throws X {
+            public T get() throws Exception {
                 return rescueException.apply(exception);
             }
         });
