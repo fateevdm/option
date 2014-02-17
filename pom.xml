@@ -60,7 +60,7 @@
                 <artifactId>maven-source-plugin</artifactId>
                 <configuration>
                     <outputDirectory>${project.basedir}/target/source</outputDirectory>
-                    <finalName>${project.artifactId}-${parent.version}-source</finalName>
+                    <finalName>${project.artifactId}-${project.version}</finalName>
                     <attach>true</attach>
                 </configuration>
                 <executions>

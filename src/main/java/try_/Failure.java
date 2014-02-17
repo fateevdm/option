@@ -4,14 +4,13 @@ import utils.control.Errors;
 import utils.function.exceptional.ConsumerEx;
 import utils.function.exceptional.FunctionEx;
 import utils.function.exceptional.PredicateEx;
-import utils.function.exceptional.SupplierEx;
 
 /**
  * User: Dmitrii Fateev
  * Date: 25.01.14
  * E-mail: wearing.fateev@gmail.com
  */
-final class Failure<T> extends Try<T> {
+final class Failure<T> implements Try<T> {
 
     private final Throwable exception;
 
@@ -36,7 +35,7 @@ final class Failure<T> extends Try<T> {
 
     @Override
     public Try<Throwable> failed() {
-        return Success(exception);
+        return Try.success(exception);
     }
 
     @Override
@@ -63,22 +62,16 @@ final class Failure<T> extends Try<T> {
 
     @Override
     public Try<T> recover(final FunctionEx<Throwable,? extends T> rescueException) {
-        return Try.asTry(new SupplierEx<T>() {
-            @Override
-            public T get() throws Exception {
-                return rescueException.apply(exception);
-            }
-        });
+        return Try.asTry(() -> rescueException.apply(exception));
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Try<T> recoverWith(FunctionEx<Throwable, ? extends Try<T>> rescueException){
         try {
             return rescueException.apply(exception);
         } catch (Throwable t) {
             if (Errors.isFatal(t)) Errors.throwAsUnchecked(t);
-            return Failure(t);
+            return Try.failure(t);
         }
     }
 

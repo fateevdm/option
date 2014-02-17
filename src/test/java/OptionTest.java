@@ -36,7 +36,7 @@ public class OptionTest {
         options.add(option);
 
         for (Option<String> elem : options) {
-           Option<Integer> filtered =  elem.<Integer>map(Integer::valueOf)
+           Option<Integer> filtered =  elem.map(Integer::valueOf)
             .filter(s -> s > 4);
             for(int num : filtered) {
                 System.out.println("here should print only Some(5), but print: "+filtered);
@@ -45,7 +45,7 @@ public class OptionTest {
 
         }
 
-        options.stream().<Option<Integer>>map(el -> el.map(Integer::valueOf)).forEach(System.out::println);
+        options.stream().map(el -> el.map(Integer::valueOf)).forEach(System.out::println);
 
     }
 

@@ -4,7 +4,6 @@ import utils.control.Errors;
 import utils.function.exceptional.ConsumerEx;
 import utils.function.exceptional.FunctionEx;
 import utils.function.exceptional.PredicateEx;
-import utils.function.exceptional.SupplierEx;
 
 import java.util.NoSuchElementException;
 
@@ -13,7 +12,7 @@ import java.util.NoSuchElementException;
  * Date: 25.01.14
  * E-mail: wearing.fateev@gmail.com
  */
-final class Success<T> extends Try<T> {
+final class Success<T> implements Try<T> {
 
     private final T value;
 
@@ -38,17 +37,17 @@ final class Success<T> extends Try<T> {
 
     @Override
     public Try<Throwable> failed() {
-        return Failure(new UnsupportedOperationException("Success.failed"));
+        return Try.failure(new UnsupportedOperationException("Success.failed"));
     }
 
     @Override
     public Try<T> filter(PredicateEx<? super T> p) {
         try {
             if (p.test(value)) return this;
-            else return Failure(new NoSuchElementException("Predicate does not hold for " + value));
+            else return Try.failure(new NoSuchElementException("Predicate does not hold for " + value));
         } catch (Throwable t) {
             if (Errors.isFatal(t)) Errors.throwAsUnchecked(t);
-            return Failure(t);
+            return Try.failure(t);
         }
 
     }
@@ -59,7 +58,7 @@ final class Success<T> extends Try<T> {
             return f.apply(value);
         } catch (Throwable t) {
             if (Errors.isFatal(t)) Errors.throwAsUnchecked(t);
-            return Failure(t);
+            return Try.failure(t);
         }
     }
 
@@ -74,12 +73,7 @@ final class Success<T> extends Try<T> {
 
     @Override
     public <U> Try<U> map(final FunctionEx<? super T, ? extends U> f) {
-        return Try.asTry(new SupplierEx<U>() {
-            @Override
-            public U get() throws Exception {
-                return f.apply(value);
-            }
-        });
+        return Try.asTry(() -> f.apply(value));
     }
 
     @Override

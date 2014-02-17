@@ -1,42 +1,40 @@
 package option;
 
-import utils.function.Consumer;
 import utils.function.Function;
-import utils.function.Predicate;
-import utils.function.Supplier;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * This is implementation of optional value based on Optional.java from JDK 8
  * and Option.scala from Scala SDK.
- * <p/>
+ * <p>
  * A container object which may or may not contain a non-null value.
  * If a value is present, {@code isPresent()} will return {@code true} and
  * {@code get()} will return the value.
- * <p/>
+ * <p>
  * <p>Additional methods that depend on the presence or absence of a contained
  * value are provided, such as {@link #orElse(Object) orElse()}
  * (return a default value if value not present) and
- * {@link #foreach(utils.function.Consumer)} (utils.function.Consumer)} (execute a block
+ * {@link #foreach(java.util.function.Consumer)} (utils.function.Consumer)} (execute a block
  * of code if the value is present).
- * <p/>
+ * <p>
  * <p>This is a <a href="../lang/doc-files/ValueBased.html">value-based</a>
  * class; use of identity-sensitive operations (including reference equality
  * ({@code ==}), identity hash code, or synchronization) on instances of
  * {@code Option} may have unpredictable results and should be avoided.
- * <p/>
- * <p/>
+ * <p>
+ * <p>
  *
  * @author Dmitry Fateev
  *         Email: <a href="mailto:wearing.fateev@gmail.com"></a>
  * @since 06.01.14
  */
-public abstract class Option<T> implements Iterable<T> {
-
-    protected Option(){}
+public interface Option<T> extends Iterable<T> {
 
     /**
      * If a value is present in this {@code Option}, returns the value,
@@ -60,14 +58,14 @@ public abstract class Option<T> implements Iterable<T> {
      *
      * @return {@code true} if the option is {@code None}, otherwise {@code false}
      */
-    public final boolean isEmpty() {
+    public default boolean isEmpty() {
         return !isPresent();
     }
 
     /**
      * Returns a {@code None} instance.  No value is present for this
      * Option.
-     * <p/>
+     * <p>
      * Though it may be tempting to do so, avoid testing if an object
      * is none by comparing with {@code ==} against instances returned by
      * {@code Option.none()}. There is no guarantee that it is a singleton.
@@ -75,7 +73,7 @@ public abstract class Option<T> implements Iterable<T> {
      *
      * @return an {@code None}
      */
-    public static<T> Option<T> None() {
+    public static <T> Option<T> None() {
         return None.empty();
     }
 
@@ -114,7 +112,7 @@ public abstract class Option<T> implements Iterable<T> {
      * @throws NullPointerException if value is present and {@code consumer} is
      *                              null
      */
-    public final void foreach(Consumer<? super T> consumer) {
+    public default void foreach(Consumer<? super T> consumer) {
         if (isPresent()) consumer.accept(this.get());
     }
 
@@ -129,7 +127,7 @@ public abstract class Option<T> implements Iterable<T> {
      * otherwise a {@code None}
      * @throws NullPointerException if the predicate is null
      */
-    public final Option<T> filter(Predicate<? super T> p) {
+    public default Option<T> filter(Predicate<? super T> p) {
         if (isPresent() && p.test(this.get())) return this;
         else return None.empty();
     }
@@ -141,7 +139,7 @@ public abstract class Option<T> implements Iterable<T> {
      * @param p the predicate used for testing.
      * @throws NullPointerException if the predicate is null
      */
-    public final Option<T> filterNot(Predicate<? super T> p) {
+    public default Option<T> filterNot(Predicate<? super T> p) {
         if (isEmpty() || !p.test(this.get())) return this;
         else return None.empty();
     }
@@ -158,7 +156,7 @@ public abstract class Option<T> implements Iterable<T> {
      * otherwise a {@code None}
      * @throws NullPointerException if the mapping function is null
      */
-    public final <U> Option<U> map(Function<? super T, ? extends U> mapper) {
+    public default <U> Option<U> map(Function<? super T, ? extends U> mapper) {
         if (isEmpty()) return None.empty();
         else return ofNullable(mapper.apply(this.get()));
     }
@@ -180,7 +178,7 @@ public abstract class Option<T> implements Iterable<T> {
      * @throws NullPointerException if the mapping function is null or returns
      *                              a null result
      */
-    public final <U> Option<U> flatMap(Function<? super T, ? extends Option<U>> mapper) {
+    public default <U> Option<U> flatMap(Function<? super T, ? extends Option<U>> mapper) {
         if (isEmpty()) return None.empty();
         else return Objects.requireNonNull(mapper.apply(this.get()));
     }
@@ -192,7 +190,7 @@ public abstract class Option<T> implements Iterable<T> {
      * @return {@code true} if the option has an element that equal (as determined by {@link #equals(Object)}
      * to {@code elem}, {@code false} otherwise.
      */
-    public final boolean contains(T elem) {
+    public default boolean contains(T elem) {
         return !isEmpty() && this.get().equals(elem);
     }
 
@@ -204,7 +202,7 @@ public abstract class Option<T> implements Iterable<T> {
      * @param p the predicate to test
      * @throws NullPointerException if the predicate is null
      */
-    public final boolean exist(Predicate<? super T> p) {
+    public default boolean exist(Predicate<? super T> p) {
         return !isEmpty() && p.test(this.get());
     }
 
@@ -215,7 +213,7 @@ public abstract class Option<T> implements Iterable<T> {
      * @param p the predicate to test
      * @throws NullPointerException if the predicate is null
      */
-    public final boolean forall(Predicate<? super T> p) {
+    public default boolean forall(Predicate<? super T> p) {
         return isEmpty() || p.test(this.get());
     }
 
@@ -223,7 +221,7 @@ public abstract class Option<T> implements Iterable<T> {
      * Returns a singleton list containing the {@code option}'s value
      * if it is nonempty, or the None list if the {@code option} is none.
      */
-    public final List<T> toList() {
+    public default List<T> toList() {
         if (isEmpty()) return Collections.emptyList();
         else return Collections.singletonList(this.get());
     }
@@ -235,7 +233,7 @@ public abstract class Option<T> implements Iterable<T> {
      *              be null
      * @return the value, if present, otherwise {@code other}
      */
-    public final T orElse(T other) {
+    public default T orElse(T other) {
         return isEmpty() ? other : this.get();
     }
 
@@ -250,7 +248,7 @@ public abstract class Option<T> implements Iterable<T> {
      *     JComponent textField = new JComponent(initialText.orNull,20)
      * }</pre>
      */
-    public final T orNull() {
+    public default T orNull() {
         return orElse(null);
     }
 
@@ -264,7 +262,7 @@ public abstract class Option<T> implements Iterable<T> {
      * @throws NullPointerException if value is not present and {@code other} is
      *                              null
      */
-    public final T orElseGet(Supplier<? extends T> other) {
+    public default T orElseGet(Supplier<? extends T> other) {
         return isPresent() ? this.get() : other.get();
     }
 
@@ -282,7 +280,7 @@ public abstract class Option<T> implements Iterable<T> {
      *                              A method reference to the exception constructor with an empty
      *                              argument list can be used as the supplier.
      */
-    public final <X extends Throwable> T orElseThrow(Supplier<? extends X> exceptionSupplier) throws X {
+    public default <X extends Throwable> T orElseThrow(Supplier<? extends X> exceptionSupplier) throws X {
         if (isPresent()) return this.get();
         else throw exceptionSupplier.get();
     }

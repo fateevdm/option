@@ -10,7 +10,7 @@ import java.util.Iterator;
  * @since 06.01.14
  */
 
-final class Some<T> extends Option<T> {
+final class Some<T> implements Option<T> {
 
     private final T value;
 
@@ -30,7 +30,7 @@ final class Some<T> extends Option<T> {
 
     @Override
     public Iterator<T> iterator() {
-        return new OptionIter<T>(value);
+        return new OptionIter<>(value);
     }
 
     @Override

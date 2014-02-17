@@ -1,12 +1,15 @@
 package option
+
 import spock.lang.Specification
-import utils.function.Consumer
 import utils.function.Function
-import utils.function.Predicate
-import utils.function.Supplier
+
+import java.util.function.Consumer
+import java.util.function.Predicate
+import java.util.function.Supplier
 
 import static option.Option.None
 import static option.Option.Some
+
 /**
  * User: Dmitry Fateev
  * Date: 06.01.14

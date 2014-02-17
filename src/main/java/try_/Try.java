@@ -15,52 +15,48 @@ import static option.Option.Some;
  *         E-mail: wearing.fateev@gmail.com
  * @since: 25.01.14
  */
-public abstract class Try<T> {
+public interface Try<T> {
 
-    protected Try(){}
-
-    @SuppressWarnings("unchecked")
-    public static <T> Try<T> asTry(SupplierEx<? extends T> block) {
-          try {
-              return Success(block.get());
-          } catch (Throwable t){
-              if (Errors.isFatal(t)) Errors.throwAsUnchecked(t);
-              return Failure(t);
-          }
+    static <T> Try<T> asTry(SupplierEx<? extends T> block) {
+        try {
+            return success(block.get());
+        } catch (Throwable t) {
+            if (Errors.isFatal(t)) Errors.throwAsUnchecked(t);
+            return failure(t);
+        }
     }
 
     @SuppressWarnings("unchecked")
-    public static <T, X extends Throwable> Try<T> Success(T value){
-        if (value instanceof Throwable) Errors.throwAsUnchecked((X)value);
+    static <T, X extends Throwable> Try<T> success(T value) {
+        if (value instanceof Throwable) Errors.throwAsUnchecked((X) value);
         return new Success<>(value);
     }
 
-    public static <T> Try<T> Failure(Throwable exception){
+    static <T> Try<T> failure(Throwable exception) {
         return new Failure<>(exception);
     }
 
-    public abstract boolean isFailure();
+    boolean isFailure();
 
-    public abstract boolean isSuccess();
+    boolean isSuccess();
 
-    public abstract T get();
+    T get();
 
-    public abstract Try<Throwable> failed();
+    Try<Throwable> failed();
 
-    public abstract Try<T> filter(PredicateEx<? super T> p);
+    Try<T> filter(PredicateEx<? super T> p);
 
-    public abstract<U> Try<U> flatMap(FunctionEx<? super T, ? extends Try<U>> f);
+    <U> Try<U> flatMap(FunctionEx<? super T, ? extends Try<U>> f);
 
-    public abstract void foreach(ConsumerEx<? super T> f);
+    void foreach(ConsumerEx<? super T> f);
 
-    public abstract <U> Try<U> map(FunctionEx<? super T,? extends U> f);
+    <U> Try<U> map(FunctionEx<? super T, ? extends U> f);
 
-    public abstract Try<T> recover(FunctionEx<Throwable, ? extends T> f);
+    Try<T> recover(FunctionEx<Throwable, ? extends T> f);
 
-    public abstract Try<T> recoverWith(FunctionEx<Throwable, ? extends Try<T>> rescueException);
+    Try<T> recoverWith(FunctionEx<Throwable, ? extends Try<T>> rescueException);
 
-    @SuppressWarnings("unchecked")
-    public T getOrElse(SupplierEx<? extends T> def) {
+    default T getOrElse(SupplierEx<? extends T> def) {
         if (isFailure()) try {
             return def.get();
         } catch (Exception e) {
@@ -69,29 +65,28 @@ public abstract class Try<T> {
         return get();
     }
 
-    public Try<T> orElse(SupplierEx<? extends Try<T>> def) {
+    default Try<T> orElse(SupplierEx<? extends Try<T>> def) {
         if (isSuccess()) return this;
         else try {
             return def.get();
         } catch (Throwable e) {
             if (Errors.isFatal(e)) Errors.throwAsUnchecked(e);
-            return Failure(e);
+            return failure(e);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public Option<T> toOption(){
+    default Option<T> toOption() {
         if (isFailure()) return None();
         else return Some(get());
     }
 
-    public <U> Try<U> transform(FunctionEx<? super T, ? extends Try<U>> s, FunctionEx<Throwable, ? extends Try<U>> f) {
-        try{
+    default <U> Try<U> transform(FunctionEx<? super T, ? extends Try<U>> s, FunctionEx<Throwable, ? extends Try<U>> f) {
+        try {
             if (isSuccess()) return s.apply(get());
             else return f.apply(failed().get());
-        } catch (Throwable t){
+        } catch (Throwable t) {
             if (Errors.isFatal(t)) Errors.throwAsUnchecked(t);
-            return Failure(t);
+            return failure(t);
         }
 
     }

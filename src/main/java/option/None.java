@@ -11,7 +11,7 @@ import java.util.NoSuchElementException;
  *         Email: <a href="mailto:wearing.fateev@gmail.com"></a>
  * @since 06.01.14
  */
-final class None<T> extends Option<T> {
+final class None<T> implements Option<T> {
     @Override
     public Iterator<T> iterator() {
         return Collections.emptyIterator();
@@ -22,7 +22,7 @@ final class None<T> extends Option<T> {
      */
     static final None<?> EMPTY = of();
 
-    private static <T> None<?> of(){
+    private static <T> None<?> of() {
         return new None<T>();
     }
 
@@ -42,7 +42,7 @@ final class None<T> extends Option<T> {
     /**
      * Returns a {@code None} instance.  No value is present for this
      * Option.
-     * <p/>
+     * <p>
      * Though it may be tempting to do so, avoid testing if an object
      * is none by comparing with {@code ==} against instances returned by
      * {@code Option.none()}. There is no guarantee that it is a singleton.
@@ -52,7 +52,7 @@ final class None<T> extends Option<T> {
      */
     @SuppressWarnings("unchecked")
     protected static <T> Option<T> empty() {
-        return (Option<T>)EMPTY;
+        return (Option<T>) EMPTY;
     }
 
     @Override
